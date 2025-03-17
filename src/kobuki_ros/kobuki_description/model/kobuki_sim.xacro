@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<!-- Basic differential drive mobile base -->
+<robot name="kobuki" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:include filename="$(find kobuki_description)/model/common_properties.urdf.xacro" />
+    <xacro:include filename="$(find kobuki_description)/model/kobuki_sim.gazebo.xacro"/>
+    
+    <xacro:include filename="$(find kobuki_description)/model/parts/kobuki_base.xacro"/>
+    <xacro:include filename="$(find kobuki_description)/model/wheels/kobuki_wheels.xacro"/>
+    <xacro:include filename="$(find kobuki_description)/model/sensors/lidar/kobuki_lidar.xacro"/>
+    <xacro:include filename="$(find kobuki_description)/model/sensors/imu/kobuki_imu.xacro"/>
+    <xacro:include filename="$(find kobuki_description)/model/camera/kobuki_camera.xacro"/>
+
+    <!-- <link name="base_footprint"/> -->
+    <link name="base_footprint">
+    </link>
+
+    <xacro:kobuki_base1 parent="base_footprint">
+      <!-- <origin xyz="0 0 0.16438"/> -->
+      <origin xyz="0 0 0.16438"/>
+
+    </xacro:kobuki_base1>
+
+    <xacro:kobuki_base2 parent="base_link">
+      <origin xyz="0.0 0.0 0.154"/>
+    </xacro:kobuki_base2>
+
+    <xacro:kobuki_pc parent="base_link">
+        <origin xyz="0.045 -0.0 0.121" rpy="0 0 ${PI}"/>
+    </xacro:kobuki_pc>
+
+    <xacro:kobuki_hex parent="base_link" prefix="back_left">
+      <origin xyz="-0.055 -0.12 0.12038"/>
+    </xacro:kobuki_hex>
+
+    <xacro:kobuki_hex parent="base_link" prefix="back_right">
+      <origin xyz="-0.055 0.12 0.12038"/>
+    </xacro:kobuki_hex>
+
+    <xacro:kobuki_hex parent="base_link" prefix="front_left">
+      <origin xyz="0.055 -0.12 0.12038"/>
+    </xacro:kobuki_hex>
+
+    <xacro:kobuki_hex parent="base_link" prefix="front_right">w
+      <origin xyz="0.055 0.12 0.12038"/>
+    </xacro:kobuki_hex>
+    
+    <xacro:kobuki_wheel parent="base_link" prefix="right">
+        <origin xyz="0.00 -${0.23/2} 0.0250" rpy="${-PI/2} 0 0"/>
+    </xacro:kobuki_wheel>
+
+    <xacro:kobuki_wheel parent="base_link" prefix="left">
+        <origin xyz="0.00 ${0.23/2} 0.0250" rpy="${-PI/2} 0 0"/>
+    </xacro:kobuki_wheel>
+
+    <xacro:kobuki_caster parent="base_link" prefix="front">
+        <origin xyz="0.115 0.0 0.007" rpy="${-PI/2} 0 0"/>
+    </xacro:kobuki_caster>
+
+    <xacro:kobuki_caster parent="base_link" prefix="back">
+        <origin xyz="-0.005 0.0 0.009" rpy="${-PI/2} 0 0"/>
+    </xacro:kobuki_caster>
+
+    <xacro:kobuki_lidar parent="base2_link">
+        <origin xyz="0.0 0.0 0.030" rpy="0 0 0"/>
+    </xacro:kobuki_lidar>
+
+    <xacro:kobuki_imu parent="base_link">
+        <origin xyz="0.056 0.062 0.0202" rpy="0 0 0"/>
+    </xacro:kobuki_imu>
+
+    <xacro:kobuki_camera parent="base_link">
+        <origin xyz="-0.0 0.0 0.11" rpy="0 0 0"/>
+    </xacro:kobuki_camera>
+
+    <!-- 1010 base2+lidar -->
+
+    <xacro:base1_gazebo/>
+    <xacro:base2_gazebo/>
+    <xacro:pc_gazebo/>
+    <xacro:hex_gazebo prefix="back_left"/>
+    <xacro:hex_gazebo prefix="back_right"/>
+    <xacro:hex_gazebo prefix="front_left"/>
+    <xacro:hex_gazebo prefix="front_right"/>
+    <xacro:caster_gazebo prefix="front"/>
+    <xacro:caster_gazebo prefix="back"/>
+    <xacro:wheel_gazebo prefix="right"/>
+    <xacro:wheel_gazebo prefix="left"/>
+    <xacro:lidar_gazebo/>
+    <xacro:imu_gazebo/>
+    <xacro:rgb_camera_gazebo/>
+    <xacro:depth_camera_gazebo/>
+    <xacro:control_gazebo/>
+
+</robot>

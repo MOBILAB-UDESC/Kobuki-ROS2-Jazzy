@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="https://www.ros.org/wiki/xacro">
+
+    <xacro:include filename="$(find kobuki_description)/model/camera/kobuki_camera.gazebo.xacro"/>
+
+    <xacro:macro name="kobuki_camera" params="parent *joint_origin">
+
+        <joint name="depth_camera_joint" type="fixed">
+            <xacro:insert_block name="joint_origin"/>
+            <parent link="${parent}"/>
+            <child link="depth_camera_link"/>
+            <!-- <axis xyz="1 0 0"/> -->
+        </joint>
+
+        <link name="camera_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <!-- <mesh filename="file://$(find kobuki_description)/meshes/stl/d415s.stl" /> -->
+                    <box size="0.1 0.02 0.02"/>
+                </geometry>
+            </visual>
+
+            <collision>
+                <geometry>
+                    <box size="0.1 0.02 0.02"/>
+                    <!-- <mesh filename="file://$(find kobuki_description)/meshes/stl/d415s.stl" /> -->
+                </geometry>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+            </collision>
+
+            <inertial>
+                <origin xyz="0 0 0.0"/>
+                <mass value="0.072"/>
+                <inertia ixx="0.003881243" ixy="0" ixz="0" iyy="0.000498940" iyz="0" izz="0.003879257" />
+            </inertial>
+        </link>
+
+    </xacro:macro>
+</robot>
