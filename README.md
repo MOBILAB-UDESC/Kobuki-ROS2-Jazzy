@@ -1,5 +1,9 @@
 # Kobuki
-Source: https://github.com/kobuki-base
+Sources:
+
+https://github.com/kobuki-base
+
+https://github.com/ros-controls/gz_ros2_control/tree/jazzy
 
 # Testing ROS Nav2
 To test ROS NAVIGATION, uncomment line 145 of kobuki.launch.py
