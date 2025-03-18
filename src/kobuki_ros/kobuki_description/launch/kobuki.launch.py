@@ -148,9 +148,5 @@ def generate_launch_description():
             'use_sim_time',
             default_value=use_sim_time,
             description='If true, use simulated clock'),
-        DeclareLaunchArgument(
-            'description_format',
-            default_value='urdf',
-            description='Robot description format to use, urdf or sdf'),
     ])
     return ld
