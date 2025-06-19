@@ -1,0 +1,66 @@
+tracking-mode: "path_tracking" # path_tracking, path_following
+
+v_max: 0.7  # m/s
+w_max: 1.91 # rad/s
+
+# controller: "LQR"        # LQR, DS, GC
+type-test  : "slow-sim"  # fast-sim, fast-real, slow-sim, slow-real
+
+dt         : 0.08
+
+type-traj  : "infinite"  # infinite, circle
+eta-traj   : 1.25        # amplitud
+cycl-traj  : 1           # number of cycles
+cent-traj  : [0.0, 0.0, -0.558607]  # center of the trajectory [x, y, theta]
+
+route      : "/home/nilton/Desktop/Artigo_results"
+
+fast-sim:
+  - alpha-traj: 10    # n_points : 2 * pi * alpha * n_cycles / dt
+
+fast-real:
+  - alpha-traj: 10    # n_points : 2 * pi * alpha * n_cycles / dt
+
+slow-sim:
+  - alpha-traj: 25   # n_points : 2 * pi * alpha * n_cycles / dt
+
+slow-real:
+  - alpha-traj: 25   # n_points : 2 * pi * alpha * n_cycles / dt
+
+LQR:
+  - Q:
+    - [7, 0, 0]
+    - [0, 7, 0]
+    - [0, 0, 7]
+
+  - R:
+    - [1, 0]
+    - [0, 1]
+
+DS:
+  - type: "disc-cone" # disc, plane, cone, disc-plane , disc-cone, plane-cone, disc-plane-cone
+
+  - disc:
+    - radius: 2.0
+    - center: 2.0
+
+  - plane:
+    - alpha: 0.25
+    
+  - cone:
+    - phi: 0.184799568
+    
+GC:
+  - Cz:
+    - [3.0, 0, 0]
+    - [0, 3.0, 0]
+    - [0, 0, 3.0]
+    - [0, 0, 0]
+    - [0, 0, 0]
+
+  - Dz:
+    - [0, 0]
+    - [0, 0]
+    - [0, 0]
+    - [1, 0]
+    - [0, 1]

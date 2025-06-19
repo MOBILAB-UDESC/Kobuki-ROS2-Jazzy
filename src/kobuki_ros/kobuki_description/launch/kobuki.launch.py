@@ -64,12 +64,18 @@ def generate_launch_description():
         output='screen',
         arguments=['-topic', 'robot_description', '-name',
                    'diff_drive', '-allow_renaming', 'true'],
+        parameters = [{
+        'use_sim_time'     : use_sim_time,
+        }]
     )
 
     joint_state_broadcaster_spawner = Node(
         package='controller_manager',
         executable='spawner',
         arguments=['joint_state_broadcaster'],
+        parameters = [{
+        'use_sim_time'     : use_sim_time,
+        }]
     )
     diff_drive_base_controller_spawner = Node(
         package='controller_manager',
@@ -79,6 +85,9 @@ def generate_launch_description():
             '--param-file',
             robot_controllers,
             ],
+        parameters = [{
+        'use_sim_time'     : use_sim_time,
+        }]
     )
 
     # **************************** GZ BRIDGE ****************************
@@ -93,7 +102,10 @@ def generate_launch_description():
             '-p',
             f'config_file:={bridge_params}',
         ],
-        output='screen'
+        output='screen',
+        parameters = [{
+        'use_sim_time'     : use_sim_time,
+        }]
     )
 
 
@@ -115,6 +127,9 @@ def generate_launch_description():
         executable='twist_to_twiststamped',
         name='TwistToTwistStamped',
         output='screen',
+        parameters = [{
+        'use_sim_time'     : use_sim_time,
+        }]
     )
 
     ld = LaunchDescription([
@@ -124,8 +139,8 @@ def generate_launch_description():
                 [PathJoinSubstitution([FindPackageShare('ros_gz_sim'),
                                        'launch',
                                        'gz_sim.launch.py'])]),
-            # launch_arguments=[('gz_args', [' -r -v 1 empty.sdf'])]),
-            launch_arguments=[('gz_args', [f'-r {pathWorldFile}'])]),
+            launch_arguments=[('gz_args', [' -r -v 1 empty.sdf'])]),
+            # launch_arguments=[('gz_args', [f'-r {pathWorldFile}'])]),
         RegisterEventHandler(
             event_handler=OnProcessExit(
                 target_action=gz_spawn_entity,

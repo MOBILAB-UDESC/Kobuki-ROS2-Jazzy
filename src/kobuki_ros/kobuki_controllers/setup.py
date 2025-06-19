@@ -1,5 +1,6 @@
 from setuptools import find_packages, setup
 import os
+from glob import glob
 
 package_name = 'kobuki_controllers'
 
@@ -20,6 +21,7 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        (os.path.join('share', package_name, 'config'), glob('config/*')),
         *get_data_matlab('controllers_matlab', os.path.join('share', package_name, 'controllers_matlab')),
     ],
     install_requires=['setuptools'],
@@ -31,10 +33,12 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            "LQR = kobuki_controllers.LQR:main",
-            "LMIs = kobuki_controllers.LMIs:main",
-            "LMIsRes = kobuki_controllers.LMIsRes:main",
-            "CustoGar = kobuki_controllers.CustoGar:main"
+            # "LQR = kobuki_controllers.LQR:main",
+            "LQR_planner = kobuki_controllers.LQR_planner:main",
+            # "LMIsRes = kobuki_controllers.LMIsRes:main",
+            "GuarCostDelay = kobuki_controllers.Guar_Cost_delay:main",
+            "DStabDelay = kobuki_controllers.D_Stab_delay:main",
+            "LQRDelay = kobuki_controllers.LQR_delay:main"
         ],
     },
 )

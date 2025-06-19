@@ -20,18 +20,18 @@ int main(int argc, char * argv[])
 
   geometry_msgs::msg::TwistStamped command;
 
-  command.twist.linear.x = 0.3;
+  command.twist.linear.x = 1.0;
   command.twist.linear.y = 0.0;
   command.twist.linear.z = 0.0;
 
   command.twist.angular.x = 0.0;
   command.twist.angular.y = 0.0;
-  command.twist.angular.z = 0.5;
+  command.twist.angular.z = 2.1;
 
   while (1) {
     command.header.stamp = node->now();
     publisher->publish(command);
-    std::this_thread::sleep_for(50ms);
+    std::this_thread::sleep_for(100ms);
     rclcpp::spin_some(node);
   }
   rclcpp::shutdown();

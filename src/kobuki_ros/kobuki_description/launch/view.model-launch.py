@@ -11,7 +11,7 @@ def generate_launch_description():
 
     namePackage           = 'kobuki_description'
     modelFileRelativePath = 'model/kobuki_sim.xacro'
-    rvizFileRelativePath  = 'rviz/rviz_config.rviz'
+    rvizFileRelativePath  = 'config/rviz_kobuki.rviz'
 
     pathModelFile         = os.path.join(get_package_share_directory(namePackage), modelFileRelativePath)
     robotDescription      = xacro.process_file(pathModelFile).toxml()

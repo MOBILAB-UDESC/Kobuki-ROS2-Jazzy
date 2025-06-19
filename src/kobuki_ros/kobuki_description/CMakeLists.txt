@@ -15,7 +15,7 @@ find_package(geometry_msgs REQUIRED)
 # find_package(xacro REQUIRED)
 
 install(
-  DIRECTORY launch model config meshes worlds rviz src
+  DIRECTORY launch model config meshes worlds src
   DESTINATION share/${PROJECT_NAME}
 )
 
