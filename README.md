@@ -22,5 +22,5 @@ To test ROS NAVIGATION, uncomment line 145 of kobuki.launch.py
 #### GAZEBO/RVIZ LAUNCH
      ros2 launch kobuki_descripcion kobuki.launch.py
 #### CONTROL RUN
-     ros2 run kobuki_controllers LMIs
+     ros2 run kobuki_controllers DStabDelay (or GuarCostDelay or LQRDelay)
 ![image](https://github.com/MOBILAB-UDESC/Kobuki-ROS2-Jazzy/blob/main/src/kobuki_ros/kobuki_controllers/Example1_path_tracking.png)
