@@ -4,7 +4,7 @@ v_max: 0.7  # m/s
 w_max: 1.91 # rad/s
 
 # controller: "LQR"        # LQR, DS, GC
-type-test  : "slow-sim"  # fast-sim, fast-real, slow-sim, slow-real
+type-test  : "fast-real"  # fast-sim, fast-real, slow-sim, slow-real
 
 dt         : 0.08
 
@@ -13,36 +13,36 @@ eta-traj   : 1.25        # amplitud
 cycl-traj  : 1           # number of cycles
 cent-traj  : [0.0, 0.0, -0.558607]  # center of the trajectory [x, y, theta]
 
-route      : "/home/nilton/Desktop/Artigo_results"
+route      : "/home/nilton/Desktop/Videos"
 
 fast-sim:
-  - alpha-traj: 10    # n_points : 2 * pi * alpha * n_cycles / dt
+  - rho-traj: 10    # n_points : 2 * pi * rho * n_cycles / dt
 
 fast-real:
-  - alpha-traj: 10    # n_points : 2 * pi * alpha * n_cycles / dt
+  - rho-traj: 10    # n_points : 2 * pi * rho * n_cycles / dt
 
 slow-sim:
-  - alpha-traj: 25   # n_points : 2 * pi * alpha * n_cycles / dt
+  - rho-traj: 25   # n_points : 2 * pi * rho * n_cycles / dt
 
 slow-real:
-  - alpha-traj: 25   # n_points : 2 * pi * alpha * n_cycles / dt
+  - rho-traj: 25   # n_points : 2 * pi * rho * n_cycles / dt
 
 LQR:
   - Q:
-    - [7, 0, 0]
-    - [0, 7, 0]
-    - [0, 0, 7]
+    - [5, 0, 0]
+    - [0, 5, 0]
+    - [0, 0, 5]
 
   - R:
     - [1, 0]
     - [0, 1]
 
 DS:
-  - type: "disc-cone" # disc, plane, cone, disc-plane , disc-cone, plane-cone, disc-plane-cone
+  - type: "disc" # disc, plane, cone, disc-plane , disc-cone, plane-cone, disc-plane-cone
 
   - disc:
-    - radius: 2.0
-    - center: 2.0
+    - radius: 2.2
+    - center: 2.2
 
   - plane:
     - alpha: 0.25
@@ -52,9 +52,9 @@ DS:
     
 GC:
   - Cz:
-    - [3.0, 0, 0]
-    - [0, 3.0, 0]
-    - [0, 0, 3.0]
+    - [2.236067977, 0, 0]
+    - [0, 2.236067977, 0]
+    - [0, 0, 1.224744871]
     - [0, 0, 0]
     - [0, 0, 0]
 
@@ -64,3 +64,17 @@ GC:
     - [0, 0]
     - [1, 0]
     - [0, 1]
+
+MPC:
+  - Q:
+    - [7, 0, 0]
+    - [0, 7, 0]
+    - [0, 0, 7]
+
+  - R:
+    - [1, 0]
+    - [0, 1]
+
+  - N: 15
+
+  - M: 15

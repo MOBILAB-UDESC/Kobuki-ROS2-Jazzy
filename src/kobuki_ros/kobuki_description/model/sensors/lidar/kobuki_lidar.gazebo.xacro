@@ -5,23 +5,24 @@
     <gazebo reference="lidar_link">
         <selfCollide>false</selfCollide>
         <sensor name="gpu_lidar" type="gpu_lidar">
+            <pose> 0 0 0.0215 0 0 0 </pose>
 
-            <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+            <!-- <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
                 <render_engine>ogre2</render_engine>
-            </plugin>
+            </plugin> -->
             
             <always_on>true</always_on>
             <update_rate>10</update_rate>
             <visualize>1</visualize>
             <gz_frame_id>lidar_link</gz_frame_id>
-            <topic>lidar</topic>
+            <topic>scan</topic>
             <lidar>
                 <scan>
                     <horizontal>
                         <samples>800</samples>
                         <resolution>1</resolution>
-                        <min_angle>-3.1415926535897931</min_angle>
-                        <max_angle>3.1415926535897931</max_angle>
+                        <min_angle>${-PI}</min_angle>
+                        <max_angle>${PI}</max_angle>
                     </horizontal>
                     <vertical>
                         <samples>100</samples>
@@ -35,7 +36,7 @@
                     <max>12.0</max>
                     <resolution>0.01</resolution>
                 </range>
-                <frame_id>/lidar_link</frame_id>
+                <!-- <frame_id>/lidar_link</frame_id> -->
             </lidar>
         </sensor>
     

@@ -10,28 +10,27 @@
             <xacro:insert_block name="joint_origin"/>
             <parent link="${parent}"/>
             <child link="camera_link"/>
-            <!-- <axis xyz="1 0 0"/> -->
         </joint>
 
         <link name="camera_link">
             <visual>
-                <origin xyz="0.16 -0.0 0.0" rpy="${-PI/2} 0 ${-PI/2}"/>
                 <geometry>
-                    <mesh filename="file://$(find kobuki_description)/meshes/stl/d415s.stl" />
-                    <!-- <box size="0.1 0.02 0.02"/> -->
+                    <mesh filename="file://$(find kobuki_description)/meshes/stl/d415s_rotated.stl" />
                 </geometry>
+                <xacro:insert_block name="material_light_grey"/>
+                <origin xyz="0 0 0" rpy="0 ${PI/2} 0"/>
             </visual>
 
             <collision>
                 <geometry>
-                    <mesh filename="file://$(find kobuki_description)/meshes/stl/d415s.stl" />
+                    <mesh filename="file://$(find kobuki_description)/meshes/stl/d415s_rotated.stl" />
                 </geometry>
-                <origin xyz="0.16 -0.0 0.0" rpy="${-PI/2} 0 ${-PI/2}"/>
+                <origin xyz="0 0 0" rpy="0 ${PI/2} 0"/>
             </collision>
 
             <inertial>
                 <origin xyz="0 0 0.0"/>
-                <mass value="0.072"/>
+                <mass value="0.064"/>
                 <inertia ixx="0.003881243" ixy="0" ixz="0" iyy="0.000498940" iyz="0" izz="0.003879257" />
             </inertial>
         </link>

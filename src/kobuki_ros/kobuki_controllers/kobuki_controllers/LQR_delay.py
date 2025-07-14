@@ -20,6 +20,7 @@ class LQRNode(Node):
     def __init__(self):
         super().__init__("LQRNode")
         self.yaml_file = get_package_share_directory("kobuki_controllers")+"/config/controllers_param.yaml"
+        self.istwist = False
         self.read_yaml()
         self.read_path()
 
@@ -35,9 +36,6 @@ class LQRNode(Node):
                     [0, 0],
                     [0, 1]
                 ])
-        
-        #
-        self.istwist = False
 
         #
         self.vmax = 0.7
@@ -70,10 +68,13 @@ class LQRNode(Node):
         eta       = data["eta-traj"]
         cycles    = data["cycl-traj"]
         type_test = data["type-test"]
-        alpha     = data[type_test][0]["alpha-traj"]
+        rho     = data[type_test][0]["rho-traj"]
         center    = np.array(data["cent-traj"])
 
-        self.path = Trajectory(_dt = self.dt, _eta = eta, _alpha = alpha, _cycles = cycles, _center = center, _type = traj)
+        if type_test.split('-')[1] == "real":
+            self.istwist = True
+
+        self.path = Trajectory(_dt = self.dt, _eta = eta, _rho = rho, _cycles = cycles, _center = center, _type = traj)
 
         self.Q_matrix = np.array([row for row in data["LQR"][0]['Q']])
         self.R_matrix = np.array([row for row in data["LQR"][1]['R']])

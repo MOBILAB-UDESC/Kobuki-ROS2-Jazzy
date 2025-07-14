@@ -84,10 +84,10 @@ class LMIsNode(Node):
         if type_test.split('-')[1] == "real":
             self.istwist = True
 
-        alpha     = data[type_test][0]["alpha-traj"]
+        rho     = data[type_test][0]["rho-traj"]
         center    = np.array(data["cent-traj"])
 
-        self.path = Trajectory(_dt = self.dt, _eta = eta, _alpha = alpha, _cycles = cycles, _center = center, _type = traj)
+        self.path = Trajectory(_dt = self.dt, _eta = eta, _rho = rho, _cycles = cycles, _center = center, _type = traj)
 
         self.type = data["DS"][0]["type"]
         

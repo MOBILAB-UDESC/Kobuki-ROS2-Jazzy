@@ -3,24 +3,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class Trajectory():
-    def __init__(self, _dt = 0.1, _eta = 1.25, _alpha = 5, _cycles = 1, _center = [0.0, 0.1], _type = "line"):
+    def __init__(self, _dt = 0.1, _eta = 1.25, _rho = 5, _cycles = 1, _center = [0.0, 0.1], _type = "line"):
         """
         Args:
             _dt      (float)  : Time step
             _eta     (float)  : Trajectory amplitude scaling factor
              _cycles (int)    : Nº cycles/repetitions of the trajectory
-            _alpha   (float)  : Parameter to control trajectory density (Nº points = 2π * _alpha * _cycles / _dt)
+            _rho   (float)  : Parameter to control trajectory density (Nº points = 2π * _rho * _cycles / _dt)
             _type    (str)    : Trajectory type - "circular" or "infinite"
         """
         
         self._dt     = _dt
         self._eta    = _eta
-        self._alpha  = _alpha
+        self._rho  = _rho
         self._cycles = _cycles
         self._type   = _type
         self._center = _center
 
-        self.theta_end = 2 * np.pi * self._alpha * self._cycles
+        self.theta_end = 2 * np.pi * self._rho * self._cycles
         self.n_points  = int(self.theta_end / self._dt)
 
     def get_path(self):
@@ -39,14 +39,14 @@ class Trajectory():
         if self._type == "circle":
 
             theta = np.arange(0, self.theta_end, self._dt)
-            x_ref = self._center[0] + self._eta * np.sin(theta / self._alpha)
-            y_ref = self._center[1] + self._eta * np.cos(theta / self._alpha)
+            x_ref = self._center[0] + self._eta * np.sin(theta / self._rho)
+            y_ref = self._center[1] + self._eta * np.cos(theta / self._rho)
             
         elif self._type == "infinite":
 
             theta = np.arange(0, self.theta_end, self._dt)
-            x_ref = self._center[0] + 1 * np.sin(2 * theta / self._alpha)
-            y_ref = self._center[1] + self._eta * np.sin(theta / self._alpha)
+            x_ref = self._center[0] + 1 * np.sin(2 * theta / self._rho)
+            y_ref = self._center[1] + self._eta * np.sin(theta / self._rho)
 
             x_rot = x_ref * np.cos(self._center[2]) - y_ref * np.sin(self._center[2])
             y_rot = x_ref * np.sin(self._center[2]) + y_ref * np.cos(self._center[2])

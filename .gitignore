@@ -1,0 +1,10 @@
+/build
+/install
+/log
+.vscode/
+src/kobuki_ros/kobuki_controllers/kobuki_controllers/__pycache__/MPC.cpython-312.pyc
+*.pgm
+*.data
+*.yaml
+*.posegraph
+robot_localization_debug.txt

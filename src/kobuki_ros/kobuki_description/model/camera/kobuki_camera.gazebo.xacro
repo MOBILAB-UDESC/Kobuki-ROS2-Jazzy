@@ -4,17 +4,22 @@
   <xacro:macro name="rgb_camera_gazebo">
     <gazebo reference="camera_link">
         <sensor name="rgb_camera" type="camera">
+            <pose relative_to='camera_link'> 0 0 0 0 -0.174532925 0 </pose>
+            <gz_frame_id>camera_link</gz_frame_id>
+            <topic>rgb_camera</topic>
+            <always_on>1</always_on>
+            <update_rate>15</update_rate>
+            <visualize>true</visualize>
             <camera name="RGB_Camera">
-                <updateRate>30.0</updateRate>
-                <horizontal_fov>1.3962634</horizontal_fov>
+                <horizontal_fov>1.134464014</horizontal_fov>
                 <image>
-                    <width>640</width>
-                    <height>480</height>
+                    <width>320</width>
+                    <height>240</height>
                     <format>R8G8B8</format>
                 </image>
                 <clip>
-                    <near>0.3</near>
-                    <far>300</far>
+                    <near>0.1</near>
+                    <far>5</far>
                 </clip>
             </camera>
         </sensor>
@@ -25,21 +30,48 @@
   <xacro:macro name="depth_camera_gazebo">
     <gazebo reference="camera_link">
         <sensor name="depth_camera" type="depth">
+            <pose relative_to='camera_link'> 0 0 0 0 -0.174532925 0 </pose>
+            <gz_frame_id>camera_link</gz_frame_id>
+            <topic>depth_camera</topic>
             <camera name="Depth_Camera">
-                <updateRate>30</updateRate>
-                <horizontal_fov>1.3962634</horizontal_fov>
+                <updateRate>15</updateRate>
+                <horizontal_fov>1.134464014</horizontal_fov>
                 <image>
-                    <width>640</width>
-                    <height>480</height>
+                    <width>320</width>
+                    <height>240</height>
                     <format>R8G8B8</format>
                 </image>
                 <clip>
-                    <near>0.3</near>
-                    <far>300</far>
+                    <near>0.1</near>
+                    <far>5</far>
                 </clip>
             </camera>
         </sensor>
         <material>Gazebo/Grey</material>
+    </gazebo>
+  </xacro:macro>
+
+  <xacro:macro name="rgbd_camera">
+    <gazebo reference="camera_link">
+        <sensor name="rgbd_camera" type="rgbd_camera">
+            <!-- <pose relative_to='camera_link'> 0 0 0 0 -0.174532925 0 </pose> -->
+            <pose relative_to='camera_link'> 0 0 0 0 0 0 </pose>
+            <gz_frame_id>camera_link</gz_frame_id>
+            <topic>rgbd_camera</topic>
+            <always_on>1</always_on>
+            <update_rate>2</update_rate>
+            <camera>
+                <horizontal_fov>1.134464014</horizontal_fov>
+                <image>
+                    <width>320</width>
+                    <height>240</height>
+                </image>
+                <clip>
+                    <near>0.1</near>
+                    <far>5</far>
+                </clip>
+            </camera>
+        </sensor>
     </gazebo>
   </xacro:macro>
 

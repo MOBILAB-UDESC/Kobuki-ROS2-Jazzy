@@ -17,7 +17,8 @@ def generate_launch_description():
     namePackage    = "kobuki_description"
     modelFile      = 'kobuki_sim.xacro'
     controllerFile = 'kobuki_control.yaml'
-    worldFile      = 'playground.sdf'
+    robotname      = 'kobuki'
+    worldFile      = 'mpc_test.sdf' # playground.sdf
     rvizFile       = 'rviz_kobuki.rviz'
 
     # **************************** ROBOT DESCRIPTION ****************************
@@ -63,7 +64,8 @@ def generate_launch_description():
         executable='create',
         output='screen',
         arguments=['-topic', 'robot_description', '-name',
-                   'diff_drive', '-allow_renaming', 'true'],
+                   robotname, '-allow_renaming', 'true',
+                   '-z', '-0.289810'],
         parameters = [{
         'use_sim_time'     : use_sim_time,
         }]
@@ -77,6 +79,9 @@ def generate_launch_description():
         'use_sim_time'     : use_sim_time,
         }]
     )
+
+    # **************************** ROS2 CONTROL ****************************
+
     diff_drive_base_controller_spawner = Node(
         package='controller_manager',
         executable='spawner',
@@ -87,6 +92,19 @@ def generate_launch_description():
             ],
         parameters = [{
         'use_sim_time'     : use_sim_time,
+        }]
+    )
+
+    d1_trajectory_controller_spawner = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=[
+            'd1_trajectory_controller',
+            '--param-file',
+            robot_controllers,
+        ],
+        parameters=[{
+            'use_sim_time': use_sim_time,
         }]
     )
 
@@ -132,6 +150,16 @@ def generate_launch_description():
         }]
     )
 
+    # *************************** EKG *************************
+    robot_localization_node = Node(
+        package='robot_localization',
+        executable='ekf_node',
+        name='ekf_node',
+        output='screen',
+        parameters=[os.path.join("/home/nilton/Desktop/Ros2/Kobuki-ROS2-Jazzy/src/kobuki_ros/kobuki_description/config/ekg_parameters.yaml"), {'use_sim_time': use_sim_time}]
+    )
+
+
     ld = LaunchDescription([
         # Launch gazebo environment
         IncludeLaunchDescription(
@@ -139,8 +167,8 @@ def generate_launch_description():
                 [PathJoinSubstitution([FindPackageShare('ros_gz_sim'),
                                        'launch',
                                        'gz_sim.launch.py'])]),
-            launch_arguments=[('gz_args', [' -r -v 1 empty.sdf'])]),
-            # launch_arguments=[('gz_args', [f'-r {pathWorldFile}'])]),
+            # launch_arguments=[('gz_args', [' -r -v 1 empty.sdf'])]),
+            launch_arguments=[('gz_args', [f'-r {pathWorldFile}'])]),
         RegisterEventHandler(
             event_handler=OnProcessExit(
                 target_action=gz_spawn_entity,
@@ -153,7 +181,14 @@ def generate_launch_description():
                 on_exit=[diff_drive_base_controller_spawner],
             )
         ),
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=diff_drive_base_controller_spawner,
+                on_exit=[d1_trajectory_controller_spawner],
+            )
+        ),
         node_robot_state_publisher,
+        # robot_localization_node,
         spawnModelNodeRviz,
         bridge,
         gz_spawn_entity,

@@ -22,6 +22,7 @@ class LMIsNode(Node):
         # self.yaml_file = "/home/nilton/Desktop/Ros2/Kobuki/src/kobuki_ros/kobuki_controllers/config/controllers_param.yaml"
         self.yaml_file = get_package_share_directory("kobuki_controllers")+"/config/controllers_param.yaml"
         self.path_tracking = False
+        self.istwist = False
         self.read_yaml()
         self.read_path()
 
@@ -37,9 +38,6 @@ class LMIsNode(Node):
                     [0, 0],
                     [0, 1]
                 ])
-        
-        #
-        self.istwist = False
         
         #
         self.vmax = 0.7
@@ -90,8 +88,8 @@ class LMIsNode(Node):
         #         self.name   = f"DS_{type}_r[{self.radius}]_c[{self.center}]"
 
         #     elif type == "plane":
-        #         self.alpha  = data[type][2]["alpha"]
-        #         self.name   = f"DS_{type}_alpha[{self.alpha}]"
+        #         self.rho  = data[type][2]["rho"]
+        #         self.name   = f"DS_{type}_rho[{self.rho}]"
 
         #     elif type == "cone":
         #         self.phi    = data[type][3]["phi"]
@@ -111,10 +109,13 @@ class LMIsNode(Node):
         traj      = data["type-traj"]
         eta       = data["eta-traj"]
         cycles    = data["cycl-traj"]
-        alpha     = data[type_test][0]["alpha-traj"]
+        rho     = data[type_test][0]["rho-traj"]
         center    = np.array(data["cent-traj"])
 
-        self.path = Trajectory(_dt = self.dt, _eta = eta, _alpha = alpha, _cycles = cycles, _center = center, _type = traj)
+        if type_test.split('-')[1] == "real":
+            self.istwist = True
+
+        self.path = Trajectory(_dt = self.dt, _eta = eta, _rho = rho, _cycles = cycles, _center = center, _type = traj)
 
         self.Cz_matrix = np.array([row for row in data["GC"][0]['Cz']])
         self.Dz_matrix = np.array([row for row in data["GC"][1]['Dz']])

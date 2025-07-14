@@ -3,7 +3,8 @@
   Various useful properties such as constants and materials 
  -->
 <robot name="xacro_properties" xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:property name="PI" value="3.1415926535897931" /> 
+  <xacro:property name="PI" value="3.1415926535897931" />
+  <xacro:property name="max_vel" value="30" /> <!-- 7m/s, 1.91rad/s -->
   <xacro:property name="material_white">
     <material name="white">
       <color rgba="1 1 1 1"/>
