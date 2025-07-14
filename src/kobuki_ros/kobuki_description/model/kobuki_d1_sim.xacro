@@ -3,13 +3,15 @@
 <robot name="kobuki" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
     <xacro:include filename="$(find kobuki_description)/model/common_properties.urdf.xacro" />
-    <xacro:include filename="$(find kobuki_description)/model/kobuki_sim.gazebo.xacro"/>
+    <xacro:include filename="$(find kobuki_description)/model/kobuki_d1_sim.gazebo.xacro"/>
     
     <xacro:include filename="$(find kobuki_description)/model/parts/kobuki_base.xacro"/>
     <xacro:include filename="$(find kobuki_description)/model/wheels/kobuki_wheels.xacro"/>
     <xacro:include filename="$(find kobuki_description)/model/sensors/lidar/kobuki_lidar.xacro"/>
     <xacro:include filename="$(find kobuki_description)/model/sensors/imu/kobuki_imu.xacro"/>
     <xacro:include filename="$(find kobuki_description)/model/camera/kobuki_camera.xacro"/>
+
+    <xacro:include filename="$(find kobuki_description)/model/D1/D1.urdf.xacro"/>
 
     <link name="base_footprint"> </link>
 
@@ -86,11 +88,11 @@
     <xacro:caster_gazebo prefix="back"/>
 
                                                                           <!-- KOBUKI LIDAR -->
-    <xacro:kobuki_lidar parent="base2_link">
+    <!-- <xacro:kobuki_lidar parent="base2_link">
         <origin xyz="0.0 0.0 0.030" rpy="0 0 0"/>
     </xacro:kobuki_lidar>
 
-    <xacro:lidar_gazebo/>
+    <xacro:lidar_gazebo/> -->
 
                                                                           <!-- KOBUKI IMU -->
     <xacro:kobuki_imu parent="base_link">
@@ -108,6 +110,13 @@
     <!-- <xacro:rgb_camera_gazebo/>
     <xacro:depth_camera_gazebo/> -->
     <xacro:rgbd_camera/>
+
+                                                                          <!-- D1 ARM -->
+    <xacro:D1_robot parent="base2_link">
+        <origin xyz="0.0 0.0 0.0010" rpy="0 0 0"/>
+    </xacro:D1_robot>
+    
+    <xacro:D1_gazebo/>
 
                                                                           <!-- CONTROL -->
     <xacro:control_gazebo/>

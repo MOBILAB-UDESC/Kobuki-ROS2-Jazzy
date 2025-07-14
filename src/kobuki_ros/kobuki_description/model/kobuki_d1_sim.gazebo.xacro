@@ -19,6 +19,36 @@
         <state_interface name="position"/>
         <state_interface name="velocity"/>
       </joint>
+      <joint name="D1_joint_1">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="D1_joint_2">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="D1_joint_3">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="D1_joint_4">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="D1_joint_5">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="D1_joint_6">
+        <command_interface name="position"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint>
     </ros2_control>
 
     <gazebo>
@@ -35,7 +65,7 @@
         <ros>
           <namespace>$(arg namespace)</namespace>
         </ros>
-        <parameters>$(find kobuki_description)/config/kobuki_control.yaml</parameters>
+        <parameters>$(find kobuki_description)/config/kobuki_d1_control.yaml</parameters>
       </plugin>
     </gazebo>
 

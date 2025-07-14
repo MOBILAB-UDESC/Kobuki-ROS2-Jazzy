@@ -15,8 +15,8 @@ def generate_launch_description():
     # Launch Arguments
     use_sim_time   = LaunchConfiguration('use_sim_time', default=True)
     namePackage    = "kobuki_description"
-    modelFile      = 'kobuki_sim.xacro'
-    controllerFile = 'kobuki_control.yaml'
+    modelFile      = 'kobuki_d1_sim.xacro'
+    controllerFile = 'kobuki_d1_control.yaml'
     robotname      = 'kobuki'
     worldFile      = 'mpc_test.sdf' # playground.sdf
     rvizFile       = 'rviz_kobuki.rviz'
@@ -95,6 +95,19 @@ def generate_launch_description():
         }]
     )
 
+    d1_trajectory_controller_spawner = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=[
+            'd1_trajectory_controller',
+            '--param-file',
+            robot_controllers,
+        ],
+        parameters=[{
+            'use_sim_time': use_sim_time,
+        }]
+    )
+
     # **************************** GZ BRIDGE ****************************
 
     bridge_params = os.path.join(get_package_share_directory(namePackage), 'config', 'bridge_parameters.yaml')
@@ -165,6 +178,12 @@ def generate_launch_description():
             event_handler=OnProcessExit(
                 target_action=joint_state_broadcaster_spawner,
                 on_exit=[diff_drive_base_controller_spawner],
+            )
+        ),
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=diff_drive_base_controller_spawner,
+                on_exit=[d1_trajectory_controller_spawner],
             )
         ),
         node_robot_state_publisher,
