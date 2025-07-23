@@ -53,3 +53,53 @@
     angular.z.has_acceleration_limits: true
     angular.z.max_acceleration: 2.0
     angular.z.min_acceleration: -2.0
+
+#####################################################################################################################################################################
+#                                                                                                                                                                   #
+#                                                          TRAJECTORY DRIVE CONTROLLER FOR THE D1's JOINTS                                                          #
+#                                                                                                                                                                   #
+#####################################################################################################################################################################
+
+/**/d1_trajectory_controller:
+  ros__parameters:
+    type: "joint_trajectory_controller/JointTrajectoryController"
+    joints:
+      - D1_joint_1
+      - D1_joint_2
+      - D1_joint_3
+      - D1_joint_4
+      - D1_joint_5
+      - D1_joint_6
+
+    command_interfaces:
+      - position
+
+    state_interfaces:
+      - position
+      - velocity
+
+    action_monitor_rate: 20.0
+
+    allow_partial_joints_goal: false
+    interpolate_from_desired_state: true
+    constraints:
+      stopped_velocity_tolerance: 0.01
+      goal_time: 0.0
+      D1_joint_1:
+        trajectory: 0.05
+        goal: 0.02
+      D1_joint_2:
+        trajectory: 0.05
+        goal: 0.02
+      D1_joint_3:
+        trajectory: 0.05
+        goal: 0.02
+      D1_joint_4:
+        trajectory: 0.05
+        goal: 0.02
+      D1_joint_5:
+        trajectory: 0.05
+        goal: 0.02
+      D1_joint_6:
+        trajectory: 0.05
+        goal: 0.02

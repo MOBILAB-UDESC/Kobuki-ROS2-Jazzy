@@ -58,7 +58,7 @@ public:
     mpc_output = std::vector<std::vector<double>>(max_iter, std::vector<double>(nz+nu, 0.0));
 
     odom_subscriber_ = this->create_subscription<nav_msgs::msg::Odometry>(
-      "/diff_drive_base_controller/odom", 10,
+      "/odometry/filtered", 10,
       std::bind(&ControlNode::OdomCallback, this, std::placeholders::_1));
 
     twist_stamped_publisher_ = this->create_publisher<geometry_msgs::msg::TwistStamped>(

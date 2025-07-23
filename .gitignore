@@ -2,9 +2,5 @@
 /install
 /log
 .vscode/
+/gazebo_models
 src/kobuki_ros/kobuki_controllers/kobuki_controllers/__pycache__/MPC.cpython-312.pyc
-*.pgm
-*.data
-*.yaml
-*.posegraph
-*.txt
