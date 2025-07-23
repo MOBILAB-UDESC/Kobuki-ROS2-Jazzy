@@ -14,7 +14,7 @@ slam_toolbox:
     map_frame: map
     base_frame: base_footprint #base_link
     scan_topic: /scan
-    use_map_saver: false
+    use_map_saver: true
     mode: mapping #mapping #localization
 
     # map_file_name: /home/nilton/Desktop/Ros2/Kobuki-ROS2-Jazzy/labo2ser
@@ -35,8 +35,8 @@ slam_toolbox:
     # General Parameters
     use_scan_matching: true
     use_scan_barycenter: true
-    minimum_travel_distance: 0.5
-    minimum_travel_heading: 0.5
+    minimum_travel_distance: 0.1
+    minimum_travel_heading: 0.1
     scan_buffer_size: 10
     scan_buffer_maximum_scan_distance: 10.0
     link_match_minimum_response_fine: 0.1  
