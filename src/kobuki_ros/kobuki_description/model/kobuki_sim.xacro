@@ -53,7 +53,7 @@
 
     <xacro:hex_gazebo prefix="front_left"/>
 
-    <xacro:kobuki_hex parent="base_link" prefix="front_right">w
+    <xacro:kobuki_hex parent="base_link" prefix="front_right">
       <origin xyz="0.055 0.12 0.06901"/>
     </xacro:kobuki_hex>
 
@@ -104,6 +104,10 @@
     <xacro:kobuki_camera parent="base_link">
         <origin xyz="0.165 0.0 0.05801" rpy="0 0 0"/>
     </xacro:kobuki_camera>
+
+    <xacro:kobuki_optical_camera parent="camera_link">
+        <origin xyz="0 0 0" rpy="-1.57 0 -1.57"/>
+    </xacro:kobuki_optical_camera>
 
     <!-- <xacro:rgb_camera_gazebo/>
     <xacro:depth_camera_gazebo/> -->
