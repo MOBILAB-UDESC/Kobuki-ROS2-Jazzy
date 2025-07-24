@@ -19,7 +19,7 @@ https://sedumi.ie.lehigh.edu/
 #### SIMULATION
      ros2 launch kobuki_description kobuki_launch.py
 #### REAL ROBOT
-     ros2 launch kobuki_description kobuki_launch.py use_sim_true:=false
+     ros2 launch kobuki_description kobuki_launch.py use_sim_time:=false
 #### CONTROL RUN
      ros2 run kobuki_controllers DStabDelay
 ![image](https://github.com/MOBILAB-UDESC/Kobuki-ROS2-Jazzy/blob/main/src/kobuki_ros/kobuki_controllers/Example1_path_tracking.png)
