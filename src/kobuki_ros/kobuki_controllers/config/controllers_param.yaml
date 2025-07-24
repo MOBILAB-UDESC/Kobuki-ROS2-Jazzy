@@ -4,16 +4,14 @@ v_max: 0.7  # m/s
 w_max: 1.91 # rad/s
 
 # controller: "LQR"        # LQR, DS, GC
-type-test  : "fast-real"  # fast-sim, fast-real, slow-sim, slow-real
-
+type-test  : "fast-sim"  # fast-sim, fast-real, slow-sim, slow-real
 dt         : 0.08
+route      : "/home/nilton/Desktop/Videos"
 
 type-traj  : "infinite"  # infinite, circle
 eta-traj   : 1.25        # amplitud
 cycl-traj  : 1           # number of cycles
 cent-traj  : [0.0, 0.0, -0.558607]  # center of the trajectory [x, y, theta]
-
-route      : "/home/nilton/Desktop/Videos"
 
 fast-sim:
   - rho-traj: 10    # n_points : 2 * pi * rho * n_cycles / dt
@@ -64,17 +62,3 @@ GC:
     - [0, 0]
     - [1, 0]
     - [0, 1]
-
-MPC:
-  - Q:
-    - [7, 0, 0]
-    - [0, 7, 0]
-    - [0, 0, 7]
-
-  - R:
-    - [1, 0]
-    - [0, 1]
-
-  - N: 15
-
-  - M: 15

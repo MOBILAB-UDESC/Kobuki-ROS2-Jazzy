@@ -2,7 +2,7 @@
 import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import Odometry, Path
-from geometry_msgs.msg import Twist, TwistStamped, PoseStamped
+from geometry_msgs.msg import Twist, PoseStamped
 from ament_index_python.packages import get_package_share_directory
 
 from .path import Trajectory
@@ -16,39 +16,44 @@ import yaml
 import os
 
 class LMIsNode(Node):
-
+    """
+        ROS2 Node to run an LMI-based controller (D-Stability) for trajectory tracking of a differential drive robot.
+    """
     def __init__(self):
         super().__init__("LMIsNode")
-        # self.yaml_file = "/home/nilton/Desktop/Ros2/Kobuki/src/kobuki_ros/kobuki_controllers/config/controllers_param.yaml"
+
+        # Load controller parameters from YAML
         self.yaml_file = get_package_share_directory("kobuki_controllers")+"/config/controllers_param.yaml"
-        self.istwist = False
+        self.isreal = False
         self.read_yaml()
+
+        # Get the trajectory
         self.read_path()
 
-        # Aux
+        # internal control variables
         self.k       = 0
         self.aux     = 0
         self.aux_max = 10
         self.t_init  = 0.0
 
-        #
-
-        #
+        # Linear system input matrix B (xdot = Ax + Bu)
         self.B = np.array([
                     [-1, 0],
                     [0, 0],
                     [0, 1]
                 ])
         
-        #
+        # Limits
         self.vmax = 0.7
         self.wmax = 1.91
+
+        # Controller parameters
         self.Q = np.zeros((3, 3))
         self.Y = np.zeros((2, 3))
         self.lb = 0.0
         self.current_K = np.zeros((2, 3))
 
-        # Initialize Matlab from Python
+        # Start Matlab from Python
         self.eng      = matlab.engine.start_matlab()
         package_route = get_package_share_directory('kobuki_controllers')
 
@@ -58,37 +63,23 @@ class LMIsNode(Node):
         self._pub_path = self.create_publisher(Path, "/plan", 10)
         self.publish_path()
 
+        self.twist = Twist()
         # Publishers and subscribers
-        if not self.istwist:
-
-            self._publisher = self.create_publisher(TwistStamped, "/diff_drive_base_controller/cmd_vel", 10)
-            self.twist = TwistStamped()
-
-            self.subscriber = self.create_subscription(Odometry, "/diff_drive_base_controller/odom", self.LMIsCallback, 10)
+        if not self.isreal:
+            self._publisher = self.create_publisher(Twist, "/cmd_vel", 10)
+            self.subscriber = self.create_subscription(Odometry, "/odometry/filtered", self.LMIsCallback, 10)
         else:
             self._publisher = self.create_publisher(Twist, "/commands/velocity", 10)
-            self.twist = Twist()
-
             self.subscriber = self.create_subscription(Odometry, "/odom", self.LMIsCallback, 10)
 
     def read_yaml(self):
+        """Read the YAML configuration file and set up controller and trajectory parameters."""
         with open(self.yaml_file, 'r') as f:
             data = yaml.safe_load(f)
 
+        # Controller parameters 
         self.dt   = data["dt"]
-        traj      = data["type-traj"]
-        eta       = data["eta-traj"]
-        cycles    = data["cycl-traj"]
         type_test = data["type-test"]
-
-        if type_test.split('-')[1] == "real":
-            self.istwist = True
-
-        rho     = data[type_test][0]["rho-traj"]
-        center    = np.array(data["cent-traj"])
-
-        self.path = Trajectory(_dt = self.dt, _eta = eta, _rho = rho, _cycles = cycles, _center = center, _type = traj)
-
         self.type = data["DS"][0]["type"]
         
         types = self.type.split('-')
@@ -119,10 +110,27 @@ class LMIsNode(Node):
                 self.center = 2.5
                 self.name += f"_{t}_r[{self.radius}]_c[{self.center}]"
 
+        # Trajectory parameters
+        traj      = data["type-traj"]
+        eta       = data["eta-traj"]
+        cycles    = data["cycl-traj"]
+
+        # Check if the real robot is being used
+        if type_test.split('-')[1] == "real":
+            self.isreal = True
+
+        rho     = data[type_test][0]["rho-traj"]
+        center    = np.array(data["cent-traj"])
+
+        self.path = Trajectory(_dt = self.dt, _eta = eta, _rho = rho, _cycles = cycles, _center = center, _type = traj)
+
+        # Build path for saving data
         self.route  = f"{data["route"]}/{type_test}/DS/{self.name}"
+        
         os.makedirs(self.route, exist_ok=True)
 
     def read_path(self):
+        """Load the reference trajectory from the Trajectory class."""
         self.xref, self.yref, self.thref, self.vref, self.wref = self.path.get_path()
 
         self._length = len(self.xref)
@@ -136,6 +144,7 @@ class LMIsNode(Node):
         self.K       = np.zeros((2, 3))
 
     def publish_path(self):
+        """Publish the planned trajectory on /plan for RViz visualization."""
         path_msg = Path()
         path_msg.header.frame_id = 'odom'
         path_msg.header.stamp = self.get_clock().now().to_msg()
@@ -161,7 +170,13 @@ class LMIsNode(Node):
         self.get_logger().info('Path published ...')
 
     def apply_control(self, state, k):
-        """Finds the error between the ref and the most recent state gotten from odometry callback"""
+        """
+        Apply the computed control input at time step k.
+
+        Parameters:
+        - state: [x, y, theta] current robot state
+        - k: current time step
+        """
         
         if self.thref[k] - state[2] > np.pi:
             state[2] = state[2] + 2*np.pi
@@ -184,15 +199,12 @@ class LMIsNode(Node):
         e = R_theta @ (ref_point - state)
         u = -self.K @ e
 
+        # Saturate control inputs
         v = np.clip(u[0], -self.vmax, self.vmax)
         w = np.clip(-u[1], -self.wmax, self.wmax)
 
-        if not self.istwist:
-            self.twist.twist.linear.x = v
-            self.twist.twist.angular.z = w
-        else:
-            self.twist.linear.x = v
-            self.twist.angular.z = w
+        self.twist.linear.x = v
+        self.twist.angular.z = w
 
         self.vel[k] = v
         self.wel[k] = w
@@ -209,18 +221,9 @@ class LMIsNode(Node):
 
         # self.get_logger().info(f"Control applied: v={v:.3f}, w={w:.3f}, error=[{x_error:.3f}, {y_error:.3f}, {th_error:.3f}]")
 
-    def pred_state(self, state_lmi):
-        n = 200
-        for i in range(n):
-            state_lmi[0]  += self.vel[self.k-1] * np.cos(state_lmi[2]) * self.dt / n
-            state_lmi[1]  += self.vel[self.k-1] * np.sin(state_lmi[2]) * self.dt / n
-            state_lmi[2]  += self.wel[self.k-1] * self.dt / n
-
-        return state_lmi
-
     def LMIsCallback(self, msg):
-
-        ####################################################### ACTUAL POSITION/ORIENTATION #######################################################
+        """Main control loop called on each odometry update."""
+        # Actual state
         x_actual  = msg.pose.pose.position.x
         y_actual  = msg.pose.pose.position.y
         qx        = msg.pose.pose.orientation.x
@@ -248,25 +251,18 @@ class LMIsNode(Node):
             self.k += 1
             return
 
-        ####################################################### MATRIZ A #######################################################
+        # Time-varying system matrix A
         A = np.array([
             [0, self.wref[self.k], 0],
             [-self.wref[self.k], 0, self.vref[self.k]],
             [0, 0, 0]
             ])
 
-        ####################################################### LMIS solver #######################################################
+        # Solve LMIs using MATLAB engine
         A_matlab  = matlab.double(A.tolist())
         B_matlab  = matlab.double(self.B.tolist())
         self.Y    = matlab.double(self.Y.tolist())
         self.Q    = matlab.double(self.Q.tolist())
-
-        # if self.type == "disc":
-        #     K, Y, Q = self.eng.LMIsDEs(A_matlab, B_matlab, self.type, self.radius, self.center, 0.0, 0.0, self.Q, self.Y, nargout=3)
-        # elif self.type == "plane":
-        #     K, Y, Q = self.eng.LMIsDEs(A_matlab, B_matlab, self.type, 0.0, 0, self.alpha, 0.0, self.Q, self.Y, nargout=3)
-        # elif self.type == "cone":
-        #     K, Y, Q = self.eng.LMIsDEs(A_matlab, B_matlab, self.type, 0.0, 0.0, 0.0, self.phi, self.Q, self.Y, nargout=3)
 
         K, Y, Q = self.eng.LMIsDEs(A_matlab, B_matlab, self.type, self.radius, self.center, self.alpha, self.phi, self.Q, self.Y, nargout=3)
         
@@ -278,6 +274,8 @@ class LMIsNode(Node):
         eig_vals = np.linalg.eigvals(A_cl)
         print("Closed-loop eigenvalues:", eig_vals)
 
+        # Timing check for control loop
+        # First 5-10 last more than 80ms, so are omitted
         elapsed_time = time() - self.t_init
         if elapsed_time > self.dt or self.aux < self.aux_max:
             self.get_logger().warn(f"Control callback exceeded period by {(elapsed_time - self.dt):.2f} s!")
@@ -293,12 +291,8 @@ class LMIsNode(Node):
         self.eng.quit()
 
         # Stop the robot
-        if not self.istwist:
-            self.twist.twist.linear.x = 0.0
-            self.twist.twist.angular.z = 0.0
-        else:
-            self.twist.linear.x = 0.0
-            self.twist.angular.z = 0.0
+        self.twist.linear.x = 0.0
+        self.twist.angular.z = 0.0
         self._publisher.publish(self.twist)
 
         # Save and draw data
@@ -314,6 +308,7 @@ class LMIsNode(Node):
                 self.x, self.y, self.th,
                 self.route)
         
+        # Compute error metrics
         metrics = get_IAU_IADU(self.vel, self.wel, self.dt, self.route)
 
         self.get_logger().info(f"MAE: x={mae[0]}, y={mae[1]}, theta={mae[2]} m!")

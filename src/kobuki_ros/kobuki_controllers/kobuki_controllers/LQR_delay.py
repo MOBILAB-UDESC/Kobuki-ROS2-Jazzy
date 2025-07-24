@@ -2,7 +2,7 @@
 import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import Odometry, Path
-from geometry_msgs.msg import Twist, TwistStamped, PoseStamped
+from geometry_msgs.msg import Twist, PoseStamped
 from ament_index_python.packages import get_package_share_directory
 
 from .path import Trajectory
@@ -16,74 +16,85 @@ import os
 import control
 
 class LQRNode(Node):
-
+    """
+        ROS2 Node to run an LQR controller for trajectory tracking of a differential drive robot.
+    """
     def __init__(self):
         super().__init__("LQRNode")
+
+        # Load controller parameters from YAML
         self.yaml_file = get_package_share_directory("kobuki_controllers")+"/config/controllers_param.yaml"
-        self.istwist = False
+        self.isreal = False
         self.read_yaml()
+
+        # Get the trajectory
         self.read_path()
 
-        # Aux
+        # internal control variables
         self.k       = 0
         self.aux     = 0
         self.aux_max = 10
         self.t_init  = 0.0
 
-        #
+        # Linear system input matrix B (xdot = Ax + Bu)
         self.B = np.array([
                     [-1, 0],
                     [0, 0],
                     [0, 1]
                 ])
-
-        #
+        
+        # Limits
         self.vmax = 0.7
         self.wmax = 1.91
+
+        # Controller parameters
         self.current_K = np.zeros((2, 3))
 
         # Draw the path on Rviz
         self._pub_path = self.create_publisher(Path, "/plan", 10)
         self.publish_path()
 
+        self.twist = Twist()
         # Publishers and subscribers
-        if not self.istwist:
-
-            self._publisher = self.create_publisher(TwistStamped, "/diff_drive_base_controller/cmd_vel", 10)
-            self.twist = TwistStamped()
-
-            self.subscriber = self.create_subscription(Odometry, "/diff_drive_base_controller/odom", self.LQRCallback, 10)
+        if not self.isreal:
+            self._publisher = self.create_publisher(Twist, "/cmd_vel", 10)
+            self.subscriber = self.create_subscription(Odometry, "/odometry/filtered", self.LQRCallback, 10)
         else:
-            self._publisher = self.create_publisher(Twist, "/commands/velocity", 10)
-            self.twist = Twist()
-
+            self._publisher = self.create_publisher(Twist, "/commands/velocity", 10)            
             self.subscriber = self.create_subscription(Odometry, "/odom", self.LQRCallback, 10)
 
     def read_yaml(self):
+        """Read the YAML configuration file and set up controller and trajectory parameters."""
         with open(self.yaml_file, 'r') as f:
             data = yaml.safe_load(f)
 
+        # Controller parameters 
         self.dt   = data["dt"]
+        type_test = data["type-test"]
+        self.Q_matrix = np.array([row for row in data["LQR"][0]['Q']])
+        self.R_matrix = np.array([row for row in data["LQR"][1]['R']])
+
+        # Trajectory parameters
         traj      = data["type-traj"]
         eta       = data["eta-traj"]
         cycles    = data["cycl-traj"]
-        type_test = data["type-test"]
         rho     = data[type_test][0]["rho-traj"]
         center    = np.array(data["cent-traj"])
 
+        # Check if the real robot is being used
         if type_test.split('-')[1] == "real":
-            self.istwist = True
+            self.isreal = True
 
         self.path = Trajectory(_dt = self.dt, _eta = eta, _rho = rho, _cycles = cycles, _center = center, _type = traj)
 
-        self.Q_matrix = np.array([row for row in data["LQR"][0]['Q']])
-        self.R_matrix = np.array([row for row in data["LQR"][1]['R']])
+        # Build path for saving data
         self.name      = f"LQR_Q{self.Q_matrix[:3,:3].diagonal().tolist()}_R{self.R_matrix[:2,:2].diagonal().tolist()}"
-
         self.route  = f"{data["route"]}/{type_test}/LQR/{self.name}"
+
         os.makedirs(self.route, exist_ok=True)
 
     def read_path(self):
+        """Load the reference trajectory from the Trajectory class."""
         self.xref, self.yref, self.thref, self.vref, self.wref = self.path.get_path()
 
         self._length = len(self.xref)
@@ -97,6 +108,7 @@ class LQRNode(Node):
         self.K       = np.zeros((2, 3))
 
     def publish_path(self):
+        """Publish the planned trajectory on /plan for RViz visualization."""
         path_msg = Path()
         path_msg.header.frame_id = 'odom'
         path_msg.header.stamp = self.get_clock().now().to_msg()
@@ -122,7 +134,13 @@ class LQRNode(Node):
         self.get_logger().info('Path published ...')
 
     def apply_control(self, state, k):
-        """Finds the error between the ref and the most recent state gotten from odometry callback"""
+        """
+        Apply the computed control input at time step k.
+
+        Parameters:
+        - state: [x, y, theta] current robot state
+        - k: current time step
+        """
         
         if self.thref[k] - state[2] > np.pi:
             state[2] = state[2] + 2*np.pi
@@ -145,20 +163,17 @@ class LQRNode(Node):
         e = R_theta @ (ref_point - state)
         u = -self.K @ e
 
+        # Saturate control inputs
         v = np.clip(u[0], -self.vmax, self.vmax)
         w = np.clip(-u[1], -self.wmax, self.wmax)
 
-        if not self.istwist:
-            self.twist.twist.linear.x = v
-            self.twist.twist.angular.z = w
-        else:
-            self.twist.linear.x = v
-            self.twist.angular.z = w
+        self.twist.linear.x = v
+        self.twist.angular.z = w
 
         self.vel[k] = v
         self.wel[k] = w
 
-        self._publisher.publish(self.twist)
+        self._publisher.publish(self.twist)   
 
         # Update MAE
         x_error = abs(state[0] - self.xref[k])
@@ -170,18 +185,9 @@ class LQRNode(Node):
 
         # self.get_logger().info(f"Control applied: v={v:.3f}, w={w:.3f}, error=[{x_error:.3f}, {y_error:.3f}, {th_error:.3f}]")
 
-    def pred_state(self, state_lqr):
-        n = 200
-        for i in range(n):
-            state_lqr[0]  += self.vel[self.k-1] * np.cos(state_lqr[2]) * self.dt / n
-            state_lqr[1]  += self.vel[self.k-1] * np.sin(state_lqr[2]) * self.dt / n
-            state_lqr[2]  += self.wel[self.k-1] * self.dt / n
-
-        return state_lqr
-
     def LQRCallback(self, msg):
-
-        ####################################################### ACTUAL POSITION/ORIENTATION #######################################################
+        """Main control loop called on each odometry update."""
+        # Actual state
         x_actual  = msg.pose.pose.position.x
         y_actual  = msg.pose.pose.position.y
         qx        = msg.pose.pose.orientation.x
@@ -209,14 +215,14 @@ class LQRNode(Node):
             self.k += 1
             return
 
-        ####################################################### MATRIZ A #######################################################
+        # Time-varying system matrix A
         A = np.array([
             [0, self.wref[self.k], 0],
             [-self.wref[self.k], 0, self.vref[self.k]],
             [0, 0, 0]
             ])
 
-        ####################################################### LQR solver #######################################################
+        # Solve LQR
         self.K, S, E = control.lqr(A, self.B, self.Q_matrix, self.R_matrix)
 
         elapsed_time = time() - self.t_init
@@ -231,12 +237,8 @@ class LQRNode(Node):
     def shutdown_sequence(self):
         """Clean shutdown sequence"""
         # Stop the robot
-        if not self.istwist:
-            self.twist.twist.linear.x = 0.0
-            self.twist.twist.angular.z = 0.0
-        else:
-            self.twist.linear.x = 0.0
-            self.twist.angular.z = 0.0
+        self.twist.linear.x = 0.0
+        self.twist.angular.z = 0.0
         self._publisher.publish(self.twist)
 
         # Save and draw data
@@ -248,6 +250,7 @@ class LQRNode(Node):
                   self.x, self.y, self.th, self.vel, self.wel,
                   self.route, self.name)
         
+        # Compute error metrics
         mae = get_MAE(self.xref, self.yref, self.thref,
                 self.x, self.y, self.th,
                 self.route)
