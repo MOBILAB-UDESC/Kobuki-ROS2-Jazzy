@@ -10,17 +10,16 @@ https://yalmip.github.io/
 https://sedumi.ie.lehigh.edu/
 
 # Testing ROS Nav2
-To test ROS NAVIGATION, uncomment line 145 of kobuki.launch.py
-#### GAZEBO/RVIZ LAUNCH
-     ros2 launch kobuki_descripcion kobuki.launch.py
-#### SLAM LAUNCH
-     ros2 launch slam_toolbox online_async_launch.py slam_params_file:=./src/kobuki_ros/kobuki_description/config/slam_parameters.yaml use_sim_time:=true
+#### GAZEBO/RVIZ LAUNCH + SLAM
+     ros2 launch kobuki_description kobuki_launch.py world_name:=playground.sdf slam_type:=slam
 #### NAV2 LAUNCH
      ros2 launch nav2_bringup navigation_launch.py use_sim_time:=true
      
 # Testing LMIs-based and LQR controllers for path tracking
-#### GAZEBO/RVIZ LAUNCH
-     ros2 launch kobuki_descripcion kobuki.launch.py
+#### SIMULATION
+     ros2 launch kobuki_description kobuki_launch.py
+#### REAL ROBOT
+     ros2 launch kobuki_description kobuki_launch.py use_sim_true:=false
 #### CONTROL RUN
-     ros2 run kobuki_controllers DStabDelay (or GuarCostDelay or LQRDelay)
+     ros2 run kobuki_controllers DStabDelay
 ![image](https://github.com/MOBILAB-UDESC/Kobuki-ROS2-Jazzy/blob/main/src/kobuki_ros/kobuki_controllers/Example1_path_tracking.png)

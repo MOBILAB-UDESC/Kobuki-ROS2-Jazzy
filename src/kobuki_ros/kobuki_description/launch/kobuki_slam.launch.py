@@ -9,9 +9,9 @@ from ament_index_python.packages import get_package_share_directory
 import os
 
 def generate_launch_description():
-    slam_launch_path = PathJoinSubstitution(get_package_share_directory('slam_toolbox'), 'launch', 'online_async_launch.py')
+    slam_launch_path = PathJoinSubstitution([get_package_share_directory('slam_toolbox'), 'launch', 'online_async_launch.py'])
 
-    slam_params_file = PathJoinSubstitution(get_package_share_directory('kobuki_description'), 'config', 'slam_parameters.yaml')
+    slam_params_file = PathJoinSubstitution([get_package_share_directory('kobuki_description'), 'config', 'slam_parameters.yaml'])
 
     slam_toolbox = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(slam_launch_path),
