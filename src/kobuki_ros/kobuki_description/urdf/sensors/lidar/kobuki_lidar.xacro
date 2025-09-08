@@ -2,7 +2,7 @@
 
 <robot xmlns:xacro="https://www.ros.org/wiki/xacro">
 
-    <xacro:include filename="$(find kobuki_description)/model/sensors/lidar/kobuki_lidar.gazebo.xacro"/>
+    <xacro:include filename="$(find kobuki_description)/urdf/sensors/lidar/kobuki_lidar.gazebo.xacro"/>
 
     <xacro:macro name="kobuki_lidar" params="parent *joint_origin">
         <joint name="lidar_joint" type="fixed">
@@ -16,13 +16,13 @@
                     <mesh filename="file://$(find kobuki_description)/meshes/stl/lidar2_rotated.stl"/>
                 </geometry>
             </visual>
-        
+
             <collision>
                 <geometry>
                     <mesh filename="file://$(find kobuki_description)/meshes/stl/lidar2_rotated.stl"/>
                 </geometry>
             </collision>
-        
+
             <inertial>
                 <origin xyz="0 0 0"/>
                 <mass value="0.170"/>

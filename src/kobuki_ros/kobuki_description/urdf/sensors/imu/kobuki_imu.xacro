@@ -2,7 +2,7 @@
 
 <robot xmlns:xacro="https://www.ros.org/wiki/xacro">
 
-    <xacro:include filename="$(find kobuki_description)/model/sensors/imu/kobuki_imu.gazebo.xacro"/>
+    <xacro:include filename="$(find kobuki_description)/urdf/sensors/imu/kobuki_imu.gazebo.xacro"/>
 
     <xacro:macro name="kobuki_imu" params="parent *joint_origin">
         <joint name="imu_joint" type="fixed">
@@ -19,6 +19,6 @@
                          iyy="0.000001" iyz="0"
                          izz="0.0001"/>
             </inertial>
-        </link> 
+        </link>
     </xacro:macro>
 </robot>

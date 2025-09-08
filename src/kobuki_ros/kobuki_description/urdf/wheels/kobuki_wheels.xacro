@@ -2,7 +2,7 @@
 
 <robot xmlns:xacro="https://www.ros.org/wiki/xacro">
 
-    <xacro:include filename="$(find kobuki_description)/model/wheels/kobuki_wheels.gazebo.xacro"/>
+    <xacro:include filename="$(find kobuki_description)/urdf/wheels/kobuki_wheels.gazebo.xacro"/>
 
     <xacro:macro name="kobuki_wheel" params="prefix parent *joint_origin">
         <joint name="${prefix}_wheel_joint" type="continuous">
@@ -21,14 +21,14 @@
                     <mesh filename="file://$(find kobuki_description)/meshes/wheel.dae"/>
                 </geometry>
             </visual>
-        
+
             <collision>
                 <geometry>
                     <cylinder length="0.0206" radius="0.0352"/>
                 </geometry>
                 <origin rpy="0 0 0" xyz="0 0 0"/>
             </collision>
-        
+
             <inertial>
                 <mass value="0.01" />
                 <origin xyz="0 0 0" />

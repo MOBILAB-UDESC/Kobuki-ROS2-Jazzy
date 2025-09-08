@@ -2,8 +2,8 @@
 
 <robot xmlns:xacro="https://www.ros.org/wiki/xacro">
 
-    <!-- <xacro:include filename="$(find kobuki_description)/model/common_properties.urdf.xacro"/> -->
-    <xacro:include filename="$(find kobuki_description)/model/parts/kobuki_base.gazebo.xacro"/>
+    <!-- <xacro:include filename="$(find kobuki_description)/urdf/common_properties.urdf.xacro"/> -->
+    <xacro:include filename="$(find kobuki_description)/urdf/parts/kobuki_base.gazebo.xacro"/>
 
                                                                             <!-- KOBUKI BASE -->
 
@@ -21,14 +21,14 @@
                 </geometry>
                 <!-- <origin xyz="0.001 0 0.05199" rpy="0 0 0"/> -->
             </visual>
-    
+
             <collision>
                 <geometry>
                     <cylinder length="0.10938" radius="0.178"/>
                 </geometry>
             <!-- <origin xyz="0.0 0 0.05949" rpy="0 0 0"/> -->
             </collision>
-    
+
             <inertial>
                 <origin xyz="0.01 0 0"/>
                 <!-- kobuki mass = 2.4  pc mass = 1.46 -->
@@ -63,7 +63,7 @@
                 <!-- <origin xyz="-0.0 -0.0 0.0" rpy="0 0 ${PI/2}"/> -->
                 <xacro:insert_block name="material_black"/>
             </visual>
-    
+
             <collision>
                 <geometry>
                     <mesh filename="file://$(find kobuki_description)/meshes/stl/BASE2_scaled_rotated.stl"/>
@@ -71,7 +71,7 @@
                 </geometry>
             <!-- <origin xyz="-0.0 -0.0 0.0" rpy="0 0 ${PI/2}"/> -->
             </collision>
-    
+
             <inertial>
                 <origin xyz="0 0 0"/>
                 <mass value="0.840"/>
@@ -103,7 +103,7 @@
                 <xacro:insert_block name="material_dark_grey"/>
                 <!-- <origin xyz="-0.0 -0.0 0.0" rpy="0 0 ${PI}"/> -->
             </visual>
-    
+
             <collision>
                 <geometry>
                     <mesh filename="file://$(find kobuki_description)/meshes/stl/kobuki_pc2_rotated.stl"/>
@@ -138,14 +138,14 @@
                 <origin xyz="0.0 0 0.0" rpy="0 0 0"/>
                 <xacro:insert_block name="material_red"/>
             </visual>
-    
+
             <collision>
                 <geometry>
                     <cylinder length="0.07" radius="0.005"/>
                 </geometry>
             <origin xyz="0.0 0 0.0" rpy="0 0 0"/>
             </collision>
-    
+
             <inertial>
                 <origin xyz="0.00 0 0"/>
                 <mass value="0.01"/>
@@ -172,7 +172,7 @@
                 </geometry>
                 <origin rpy="0 0 0" xyz="0 0 0"/>
             </collision>
-        
+
             <inertial>
                 <mass value="0.01" />
                 <origin xyz="0 0 0" />

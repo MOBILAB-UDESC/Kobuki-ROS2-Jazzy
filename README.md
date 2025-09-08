@@ -14,7 +14,7 @@ https://sedumi.ie.lehigh.edu/
      ros2 launch kobuki_description kobuki_launch.py world_name:=playground.sdf slam_type:=slam
 #### NAV2 LAUNCH
      ros2 launch nav2_bringup navigation_launch.py use_sim_time:=true
-     
+
 # Testing LMIs-based and LQR controllers for path tracking
 #### SIMULATION
      ros2 launch kobuki_description kobuki_launch.py

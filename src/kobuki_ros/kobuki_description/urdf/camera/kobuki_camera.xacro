@@ -2,7 +2,7 @@
 
 <robot xmlns:xacro="https://www.ros.org/wiki/xacro">
 
-    <xacro:include filename="$(find kobuki_description)/model/camera/kobuki_camera.gazebo.xacro"/>
+    <xacro:include filename="$(find kobuki_description)/urdf/camera/kobuki_camera.gazebo.xacro"/>
 
     <xacro:macro name="kobuki_camera" params="parent *joint_origin">
 

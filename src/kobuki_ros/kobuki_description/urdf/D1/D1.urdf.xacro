@@ -2,7 +2,7 @@
 
 <robot xmlns:xacro="https://www.ros.org/wiki/xacro">
 
-    <xacro:include filename="$(find kobuki_description)/model/D1/D1.gazebo.xacro"/>
+    <xacro:include filename="$(find kobuki_description)/urdf/D1/D1.gazebo.xacro"/>
 
     <xacro:macro name="D1_robot" params="parent *joint_origin">
         <joint name="D1_kobuki_joint" type="fixed">
@@ -107,7 +107,7 @@
             <axis xyz="0 1 0"/>
             <limit lower="-1.57" upper="1.57" effort="3.33" velocity="1.05"/>
         </joint>
-        
+
         <link name="D1_link_3">
             <inertial>
                 <origin xyz="0.016105 0.0275 0.044231" rpy="0 0 0"/>
@@ -202,7 +202,7 @@
             <axis xyz="1 0 0"/>
             <limit lower="-2.36" upper="2.36" effort="1.67" velocity="1.73"/>
         </joint>
-        
+
         <link name="D1_link_6">
             <inertial>
                 <origin xyz="0.03844 -0.00044094 0.0060952" rpy="0 0 0"/>
