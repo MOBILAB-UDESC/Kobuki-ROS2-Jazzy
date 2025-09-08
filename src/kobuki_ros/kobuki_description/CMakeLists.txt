@@ -15,7 +15,7 @@ find_package(geometry_msgs REQUIRED)
 # find_package(xacro REQUIRED)
 
 install(
-  DIRECTORY launch model config meshes worlds maps src
+  DIRECTORY launch urdf config meshes worlds src
   DESTINATION share/${PROJECT_NAME}
 )
 

@@ -1,7 +1,7 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument, OpaqueFunction, IncludeLaunchDescription, TimerAction
-from launch.conditions import IfCondition
+from launch.conditions import IfCondition, UnlessCondition
 from launch.substitutions import LaunchConfiguration, Command, PathJoinSubstitution, PythonExpression
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from ament_index_python.packages import get_package_share_directory
@@ -21,13 +21,13 @@ def slam_launch(context, *args, **kwargs):
     else:
         return []
 
-    slam_launch_path = PathJoinSubstitution([args[0], 'launch', slam_launch_file])
+    slam_launch_path = PathJoinSubstitution([get_package_share_directory('kobuki_navigation'), 'launch', slam_launch_file])
 
     return [IncludeLaunchDescription(PythonLaunchDescriptionSource(slam_launch_path),
-                                     launch_arguments={'use_sim_time': args[1], 'slam_params': slam_launch_path}.items())]
+                                     launch_arguments={'use_sim_time': args[0], 'slam_params': slam_launch_path}.items())]
 
 def generate_launch_description():
-    
+
     namePackage   = "kobuki_description"
     nameRviz2File = "rviz_kobuki.rviz"
     packagePath   = get_package_share_directory(namePackage)
@@ -35,8 +35,8 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time')
 
     ######################################################### Robot State Node #########################################################
-    robot_description = Command(['xacro ', 
-                                 PathJoinSubstitution([packagePath, 'model', LaunchConfiguration('robot_model')]), '_sim.xacro'])
+    robot_description = Command(['xacro ',
+                                 PathJoinSubstitution([packagePath, 'urdf', LaunchConfiguration('robot_model')]), '_sim.xacro'])
 
     robot_state_node = Node(
                     package='robot_state_publisher', executable='robot_state_publisher', output='screen',
@@ -47,7 +47,7 @@ def generate_launch_description():
     joint_state_publisher = Node(
                     package='joint_state_publisher', executable='joint_state_publisher', output='screen', name='joint_state_publisher',
                     parameters=[{'use_sim_time': use_sim_time}],
-                    condition=IfCondition(PythonExpression(["'", use_sim_time, "' == 'false'"]))
+                    condition=UnlessCondition(use_sim_time)
     )
 
     ############################################################ RViz2 Node ############################################################
@@ -65,7 +65,7 @@ def generate_launch_description():
 
     gazebo_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(PathJoinSubstitution([packagePath, 'launch', 'kobuki_gazebo_launch.py'])),
-        condition=IfCondition(LaunchConfiguration('use_sim_time')),
+        condition=IfCondition(use_sim_time),
         launch_arguments={'world_path': gazebo_path, 'use_sim_time': use_sim_time}.items()
     )
 
@@ -75,7 +75,7 @@ def generate_launch_description():
 
     ros2_control_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(PathJoinSubstitution([packagePath, 'launch', 'kobuki_ros2_control_launch.py'])),
-        condition=IfCondition(LaunchConfiguration('use_sim_time')),
+        condition=IfCondition(use_sim_time),
         launch_arguments={'use_sim_time': use_sim_time, 'ros2_control_params': robot_controllers}.items()
     )
 
@@ -112,5 +112,5 @@ def generate_launch_description():
                              TimerAction(period=5.0, actions=[ros2_control_launch]),
                              ekf_node,
                              twist_remap_node,
-                             OpaqueFunction(function=slam_launch, args=[packagePath, use_sim_time]),
+                             OpaqueFunction(function=slam_launch, args=[use_sim_time]),
     ])
